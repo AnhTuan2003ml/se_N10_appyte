@@ -9,6 +9,8 @@
     <p>Birthday: {{ user.birthday }}</p>
     <p>Gender: {{ user.gender }}</p>
     <p>Email: {{ user.email }}</p>
+    <p>Bệnh đã mắc: {{ user.diseases_past }}</p>
+    <p>Bệnh đang mắc: {{ user.diseases_present }}</p>
     <a href="{{ url_for('delete_account') }}">Xóa tài khoản</a>
     <a href="{{ url_for('logout') }}">Đăng xuất</a>
     <a href="{{ url_for('update_diseases') }}">Cập nhật bệnh</a>

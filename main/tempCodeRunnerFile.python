@@ -115,3 +115,22 @@ def delete_disease(id):
     return redirect(url_for('list_diseases'))
 if __name__ == '__main__':
     app.run(debug=True)
+
+
+
+
+@app.route('/diseases/add', methods=['GET', 'POST'])
+def add_disease():
+    if request.method == 'POST':
+        diseases_past = request.form['description']
+        diseases_present = request.form['description']
+        if 'user' in session:
+            user = User.query.filter_by(email=session['user']).first()
+            db.session.Update(diseases_past,diseases_present)
+            db.session.commit()
+            session.pop('user', None)
+            return redirect(url_for('profile'))
+        else:
+            return redirect(url_for('index'))
+    else:
+        return render_template('add_disease.html')

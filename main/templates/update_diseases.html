@@ -1,0 +1,12 @@
+<!-- Thêm form để cập nhật thông tin bệnh của người dùng -->
+<form method="POST" action="{{ url_for('update_diseases') }}">
+  <div class="form-group">
+      <label for="diseases_past">Bệnh đã mắc</label>
+      <input type="text" id="diseases_past" name="diseases_past" required><br><br>
+  </div>
+  <div >
+      <label for="diseases_present">Bệnh đang mắc</label>
+      <input type="text" id="diseases_present" name="diseases_present" required><br><br>
+  </div>
+  <button type="submit" class="btn btn-primary">Cập nhật</button>
+</form>

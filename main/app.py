@@ -16,6 +16,8 @@ class User(db.Model):
     gender = db.Column(db.String(10), nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(120), nullable=False)
+    diseases_past= db.Column(db.Text, nullable=True)
+    diseases_present = db.Column(db.Text, nullable=True)
 
     
 @app.route('/')
@@ -83,7 +85,10 @@ def register():
 def profile():
     if 'user' in session:
         user = User.query.filter_by(email=session['user']).first()
-        return render_template('profile.html', user=user)
+        if user.diseases_past is None and user.diseases_present is None:
+            return render_template('profile.html', user=user)
+        else:
+            return render_template('newprofile.html', user=user)
     else:
         return redirect(url_for('login'))
 
@@ -98,6 +103,19 @@ def delete_account():
             session.pop('user', None)
             return redirect(url_for('index'))
         return render_template('delete_account.html', user=user)
+    else:
+        return redirect(url_for('login'))
+
+@app.route('/update_diseases', methods=['GET', 'POST'])
+def update_diseases():
+    if 'user' in session:
+        user = User.query.filter_by(email=session['user']).first()
+        if request.method == 'POST':
+            user.diseases_past = request.form['diseases_past']
+            user.diseases_present = request.form['diseases_present']
+            db.session.commit()
+            return render_template('newprofile.html', user=user)
+        return render_template('update_diseases.html', user=user)
     else:
         return redirect(url_for('login'))
 
