@@ -16,4 +16,4 @@ mycursor.execute("SELECT * FROM user")
 myresult = mycursor.fetchall()
 
 for x in myresult:
-  print(x)
+  print(x[4])

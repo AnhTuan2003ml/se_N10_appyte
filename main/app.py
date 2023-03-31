@@ -32,7 +32,28 @@ def login():
             session['user'] = user.email
             return redirect(url_for('profile'))
         else:
-            return redirect(url_for('login'))
+            mydb = mysql.connector.connect(
+            host="localhost",
+            user="root",
+            password="anhtuan2003",
+            database="health_advice"
+            )
+
+            # Thực hiện truy vấn SQL
+            mycursor = mydb.cursor()
+
+            mycursor.execute("SELECT * FROM user")
+
+            myresult = mycursor.fetchall()
+            check= False
+            for x in myresult:
+                if x[4]==email:
+                    check=True
+                    break
+            if check==True:
+                return redirect(url_for('login'))
+            else:
+                return redirect(url_for('register'))
     else:
         return render_template('login.html')
 
