@@ -1,16 +1,17 @@
+
 from flask import Flask, render_template, request, redirect, session, url_for
 from flask_sqlalchemy import SQLAlchemy
-import mysql.connector
-
+from werkzeug.security import generate_password_hash, check_password_hash
+from sqlalchemy import text
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql://root:anhtuan2003@localhost/health_advice'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['SQLALCHEMY_DATABASE_URI'] = 'mysql+pymysql://root:anhtuan2003@localhost/health_advice?charset=utf8'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = True
 app.config['SECRET_KEY'] = 'secret_key'
 
 db = SQLAlchemy(app)
 
 class User(db.Model):
-    id = db.Column(db.Integer, primary_key=True)
+    id = db.Column(db.Integer, unique=True, primary_key=True)
     username = db.Column(db.String(80), unique=True, nullable=False)
     birthday= db.Column(db.Date,unique=True, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
@@ -18,7 +19,9 @@ class User(db.Model):
     password = db.Column(db.String(120), nullable=False)
     diseases_past= db.Column(db.Text, nullable=True)
     diseases_present = db.Column(db.Text, nullable=True)
-
+    is_admin = db.Column(db.Boolean, nullable=False, default=False)
+    def __str__(self):
+        return self.email
     
 @app.route('/')
 def index():
@@ -32,32 +35,11 @@ def login():
         user = User.query.filter_by(email=email, password=password).first()
         if user:
             session['user'] = user.email
-            return redirect(url_for('profile'))
+            return redirect(url_for('admin'))
         else:
-            mydb = mysql.connector.connect(
-            host="localhost",
-            user="root",
-            password="anhtuan2003",
-            database="health_advice"
-            )
-
-            # Thực hiện truy vấn SQL
-            mycursor = mydb.cursor()
-
-            mycursor.execute("SELECT * FROM user")
-
-            myresult = mycursor.fetchall()
-            check= False
-            for x in myresult:
-                if x[4]==email:
-                    check=True
-                    break
-            if check==True:
-                return redirect(url_for('login'))
-            else:
-                return redirect(url_for('register'))
+             return redirect(url_for('register'))
     else:
-        return render_template('login.html')
+        return render_template('index.html')
 
 
 @app.route('/logout')
@@ -73,14 +55,19 @@ def register():
         gender = request.form['gender']
         email = request.form['email']
         password = request.form['password']
-        user = User(username=username,birthday=birthday,gender=gender, email=email, password=password)
-        db.session.add(user)
-        db.session.commit()
-        session['user'] = user.email
-        return redirect(url_for('profile'))
+        existing_user = User.query.filter_by(email=email).first()
+        if existing_user:
+            # flash('Email already exists, please choose another one.')
+            return redirect(url_for('register'))
+        else:
+            user = User(username=username,birthday=birthday,gender=gender, email=email, password=password)
+            db.session.add(user)
+            db.session.commit()
+            session['user'] = user.email
+            return redirect(url_for('admin'))
     else:
-        return render_template('register.html')
-    
+        return render_template('index.html')
+
 @app.route('/profile')
 def profile():
     if 'user' in session:
@@ -92,7 +79,6 @@ def profile():
     else:
         return redirect(url_for('login'))
 
-
 @app.route('/delete-account', methods=['GET', 'POST'])
 def delete_account():
     if 'user' in session:
@@ -100,11 +86,14 @@ def delete_account():
         if request.method == 'POST':
             db.session.delete(user)
             db.session.commit()
+            db.session.execute(text("ALTER TABLE user AUTO_INCREMENT = 1"))
+            db.session.commit()
             session.pop('user', None)
             return redirect(url_for('index'))
         return render_template('delete_account.html', user=user)
     else:
         return redirect(url_for('login'))
+
 
 @app.route('/update_diseases', methods=['GET', 'POST'])
 def update_diseases():
@@ -119,6 +108,34 @@ def update_diseases():
     else:
         return redirect(url_for('login'))
 
+@app.route('/admin')
+def admin():
+    if 'user' in session:
+        user = User.query.filter_by(email=session['user']).first()
+        if user.is_admin:
+            users = User.query.all()
+            return render_template('users.html', users=users)
+        else:
+            # Người dùng không phải admin, chuyển hướng về trang profile
+            return redirect(url_for('profile'))
+    else:
+        # Người dùng chưa đăng nhập, chuyển hướng về trang đăng nhập
+        return redirect(url_for('login'))
+    
+@app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
+def delete_user(user_id):
+    # Kiểm tra xem người dùng hiện tại có phải là admin hay không
+    if 'user' in session:
+        admin_user = User.query.filter_by(email=session['user'], is_admin=True).first()
+        if admin_user:
+            # Xóa người dùng
+            user = User.query.filter_by(id=user_id).first()
+            db.session.delete(user)
+            db.session.commit()
+            db.session.execute(text("ALTER TABLE user AUTO_INCREMENT = 1"))
+            db.session.commit()
+    # Chuyển hướng về trang quản trị
+    return redirect(url_for('admin'))
 
 if __name__ == '__main__':
     app.run(debug=True)

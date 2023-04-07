@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<script>
+    function confirmDelete(userEmail) {
+        var result = confirm("Bạn có chắc chắn muốn xóa tài khoản người dùng có email là " + userEmail + " ?");
+        if (result) {
+            // Nếu người dùng đồng ý xóa, thực hiện yêu cầu xóa bằng phương thức POST
+            var form = document.createElement("form");
+            form.setAttribute("method", "POST");
+            form.setAttribute("action", "/admin/delete-user/" + userEmail);
+            document.body.appendChild(form);
+            form.submit();
+        }
+    }
+    </script>
+    
+<html>
+<head>
+    <title>Danh sách người dùng</title>
+</head>
+<body>
+    <h1>Danh sách người dùng</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Tên người dùng</th>
+                <th>Email</th>
+                <th>Ngày sinh</th>
+                <th>Giới tính</th>
+                <th>Chỉnh sửa</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{ user.id }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
+                <td>{{ user.birthday }}</td>
+                <td>{{ user.gender }}</td>
+                {% if not user.is_admin %}
+                    <form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST">
+                        <td>
+                            <button onclick="confirmDelete('{{ user.email }}')" class="btn btn-danger">Xóa</button>
+                        </td>
+                     </form>
+                {% else %}
+                    <td>Không được phép</td>
+                {% endif %}
+                {% endfor %}
+            </tr>
+        </tbody>
+    </table>
+    <a href="{{ url_for('logout') }}">Đăng xuất</a>
+</body>
+</html>

@@ -5,6 +5,11 @@
   <p>Bạn có chắc chắn muốn xóa tài khoản {{ user.username }} không?</p>
   <form method="POST">
     <button type="submit" class="btn btn-danger">Xóa tài khoản</button>
+    {% if not user.is_admin %}
     <a href="{{ url_for('profile') }}" class="btn btn-secondary">Quay lại</a>
+    {% endif %}
+    {% if user.is_admin %}
+    <a href="{{ url_for('admin') }}" class="btn btn-secondary">Quay lại</a>
+    {% endif %}
   </form>
 </html>

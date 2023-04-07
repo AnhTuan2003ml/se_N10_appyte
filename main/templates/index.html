@@ -1,12 +1,83 @@
-<!DOCTYPE html>
 <html>
   <head>
-    <title>Trang chủ</title>
+      <meta charset="UTF-8" />
+      <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" />
+  
+    </head>
   </head>
   <body>
-    <h1>Trang chủ</h1>
-    <p>Xin chào! Bạn có thể đăng nhập hoặc đăng ký tài khoản.</p>
-    <a href="{{ url_for('login') }}">Đăng nhập</a>
-    <a href="{{ url_for('register') }}">Đăng ký</a>
+    <h2>Đăng nhập / Đăng ký</h2>
+    <div class="container" id="container">
+      <div class="form-container sign-up-container">
+        <form action="{{ url_for('register') }}" method="post">
+          <h1>Đăng ký tài khoản</h1>
+          <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+          <span>Hoạc sử dụng tài khoản gmail để đăng ký</span>
+          <input type="text" name="username" id="username" placeholder="Tên tài khoản" />
+          <input type="date" name="dob" id="dob" placeholder="Date of Birth" />
+          <!-- <input type="email" name="gender" id="gender" placeholder="Gender" /> -->
+          <select id="gender" name="gender" required>
+            <option value="male">nam</option>
+            <option value="female">nu</option>
+          </select>
+          <input type="email" name="email" id="email" placeholder="Email" />
+          <input type="password" name="password" id="password" placeholder="Mật khẩu" />
+          <input  type="password" name="password" id="password" placeholder="Xác thực lại mật khẩu" />
+          <button type="submit">Đăng ký</button>
+          <script> confirm("Bạn có chắc chắn muốn xóa tài khoản người dùng có email là " + userEmail + " ?")</script>
+        </form>
+      </div>
+      <div class="form-container sign-in-container">
+        <form action="{{ url_for('login') }}" method="post">
+          <h1>Đăng nhập</h1>
+          <div class="social-container">
+            <a href="#" class="social"><i class="fab fa-facebook-f"></i></a>
+            <a href="#" class="social"><i class="fab fa-google-plus-g"></i></a>
+            <a href="#" class="social"><i class="fab fa-linkedin-in"></i></a>
+          </div>
+          <span>Hoạc sử dụng tài khoản để đăng nhập</span>
+          <input type="email" name="email" id="email" placeholder="Email" />
+          <input type="password" name="password" id="password" placeholder="Mật khẩu" />
+          <a href="#">Quên mật khẩu?</a>
+          <input type="submit">Đăng nhập</input>
+        </form>
+      </div>
+      <div class="overlay-container">
+        <div class="overlay">
+          <div class="overlay-panel overlay-left">
+            <h1>Chào mừng bạn quay lại</h1>
+            <p>
+              Để sử dụng dịch vụ của chúng tôi hãy đăng nhập bằng tài khoản cá nhân của bạn
+            </p>
+            <button class="ghost" id="signIn">Đăng nhập</button>
+          </div>
+          <div class="overlay-panel overlay-right">
+            <h1>Xin chào!</h1>
+            <p>Nếu bạn chưa có tài khoản hãy đăng ký tài khoản để sử dụng dịch vụ của chúng tôi tại đây</p>
+            <button class="ghost" id="signUp">Đăng ký</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script>
+      const signUpButton = document.getElementById("signUp");
+      const signInButton = document.getElementById("signIn");
+      const container = document.getElementById("container");
+
+      signUpButton.addEventListener("click", () => {
+        container.classList.add("right-panel-active");
+      });
+
+      signInButton.addEventListener("click", () => {
+        container.classList.remove("right-panel-active");
+      });
+    </script>
+    <script src="main.js"></script>
   </body>
 </html>

@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Xóa tài khoản người dùng</title>
+</head>
+<body>
+    <h1>Xóa tài khoản người dùng</h1>
+    <p>Bạn có chắc chắn muốn xóa tài khoản người dùng này?</p>
+    <p><strong>Tên đăng nhập:</strong> {{ user.username }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <form method="post">
+        <input type="submit" value="Xóa">
+    </form>
+    <p><a href="{{ url_for('admin') }}">Trở về danh sách người dùng</a></p>
+</body>
+</html>

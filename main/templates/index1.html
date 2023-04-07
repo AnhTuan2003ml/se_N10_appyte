@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>code by Anh Tuấn</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/b.css') }}">
+
+</head>
+
+<body>
+  <!-- partial:index.partial.html -->
+  <html>
+
+  <head>
+    <title></title>
+    
+  </head>
+
+  <body>
+
+
+    <div class="bg_heart"></div>
+
+    <div class="container">
+      
+    <h1>Trang chủ</h1>
+    <p>Xin chào! Bạn có thể đăng nhập hoặc đăng ký tài khoản.</p>
+    <a href="{{ url_for('login') }}" style="color: orange">Đăng nhập</a>
+    <a href="{{ url_for('register') }}" style="color: orange">Đăng ký</a>
+
+    </div>
+
+  </body>
+
+  </html>
+  <!-- partial -->
+  <script type="module" src="{{ url_for('static', filename='js/a.js') }}"></script>
+
+</body>
+
+</html>
