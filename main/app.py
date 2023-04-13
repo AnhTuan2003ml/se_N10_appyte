@@ -11,21 +11,33 @@ app.config['SECRET_KEY'] = 'secret_key'
 db = SQLAlchemy(app)
 
 class User(db.Model):
+    __tablename__ = 'user'
     id = db.Column(db.Integer, unique=True, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    username = db.Column(db.String(50), unique=True, nullable=False)
     birthday= db.Column(db.Date,unique=True, nullable=False)
     gender = db.Column(db.String(10), nullable=False)
-    email = db.Column(db.String(120), unique=True, nullable=False)
-    password = db.Column(db.String(120), nullable=False)
+    email = db.Column(db.String(50), unique=True, nullable=False)
+    password = db.Column(db.String(50), nullable=False)
     diseases_past= db.Column(db.Text, nullable=True)
     diseases_present = db.Column(db.Text, nullable=True)
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     def __str__(self):
         return self.email
+class  Diseases(db.Model):
+    __tablename__ = 'disease'
+    id = db.Column(db.Integer, unique=True, primary_key=True)
+    diseases_name= db.Column(db.Text, nullable=True)
+    diseases_symptom = db.Column(db.Text, nullable=True)
+    def __str__(self):
+        return self.diseases_symptom
     
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/home')
+def home():
+    return render_template('home.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -117,7 +129,7 @@ def admin():
             return render_template('users.html', users=users)
         else:
             # Người dùng không phải admin, chuyển hướng về trang profile
-            return redirect(url_for('profile'))
+            return  render_template('home.html')
     else:
         # Người dùng chưa đăng nhập, chuyển hướng về trang đăng nhập
         return redirect(url_for('login'))
@@ -136,6 +148,11 @@ def delete_user(user_id):
             db.session.commit()
     # Chuyển hướng về trang quản trị
     return redirect(url_for('admin'))
+@app.route('/home/search', methods=['POST'])
+def search():
+    symptom = request.form['text']
+    diseases = Diseases.query.filter_by( diseases_symptom=symptom).first()
+    return render_template('diseases.html', diseases=diseases)
 
 if __name__ == '__main__':
     app.run(debug=True)
