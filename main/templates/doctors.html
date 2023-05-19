@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <script>
@@ -110,14 +111,14 @@
 		<main>
 			<div class="head-title">
 				<div class="left">
-					<h1>Users</h1>
+					<h1>Doctors</h1>
 					<ul class="breadcrumb">
 						<li>
 							<a href="#">Admin</a>
 						</li>
 						<li><i class='bx bx-chevron-right'></i></li>
 						<li>
-							<a class="active" href="#">Users</a>
+							<a class="active" href="#">Doctors</a>
 						</li>
 					</ul>
 				</div>
@@ -155,44 +156,48 @@
 			<div class="table-data">
 				<div class="order">
 					<div class="head">
-						<h3>Thông tin các người dùng</h3>
+						<h3>Thông tin các Bác Sĩ</h3>
 						<i class='bx bx-search'></i>
 						<i class='bx bx-filter'></i>
 					</div>
 					<table>
 						<thead>
-							<tr>
-								<th>ID</th>
-								<th>Username</th>
-								<th>Email</th>
-								<th>Birthday</th>
-								<th>Gender</th>
-								<th>Action</th>
-							</tr>
+							<table>
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>Name</th>
+                                        <th>Email</th>
+                                        <th>Experience</th>
+                                        <th>Age</th>
+                                        <th>Specialization</th>
+                                        <th>Workplace</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for doctor in doctors %}
+                                    <tr>
+                                        <td>{{ doctor.id }}</td>
+                                        <td>{{ doctor.name }}</td>
+                                        <td>{{ doctor.email }}</td>
+                                        <td>{{ doctor.experience }}</td>
+                                        <td>{{ doctor.age }}</td>
+                                        <td>{{ doctor.specialization }}</td>
+                                        <td>{{ doctor.workplace }}</td>
+                                        <td>
+											<form method="POST" action="{{ url_for('delete_doctor', doctor_id=doctor.id) }}">
+												<input type="submit" value="Delete">
+											</form>
+                                        </td>
+
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                            
 						</thead>
-						<tbody>
-							{% for user in users %}
-							<tr>
-								<td>{{ user.id }}</td>
-								<td>{{ user.username }}</td>
-								<td>{{ user.email }}</td>
-								<td>{{ user.birthday }}</td>
-								<td>{{ user.gender }}</td>
-								{% if not user.is_admin %}
-								<td>
-									<form action="{{ url_for('delete_user', user_id=user.id) }}" method="POST">
-										<button onclick="confirmDelete('{{ user.email }}',user.id)"
-											class="btn btn-danger">Delete</button>
-									</form>
-								</td>
-
-								{% else %}
-								<td>Not allowed</td>
-								{% endif %}
-							</tr>
-							{% endfor %}
-
-						</tbody>
+						
 					</table>
 
 				</div>

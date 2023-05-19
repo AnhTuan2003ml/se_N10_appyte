@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Add Doctor</title>
+</head>
+<body>
+    <h1>Add Doctor</h1>
+    <form method="POST" action="{{ url_for('add_doctor') }}">
+        <label for="email">Email:</label>
+        <input type="email" name="email" required><br><br>
+        
+        <label for="name">Name:</label>
+        <input type="text" name="name" required><br><br>
+        
+        <label for="experience">Experience:</label>
+        <input type="number" name="experience" required><br><br>
+        
+        <label for="age">Age:</label>
+        <input type="number" name="age" required><br><br>
+        
+        <label for="specialization">Specialization:</label>
+        <input type="text" name="specialization" required><br><br>
+        
+        <label for="workplace">Workplace:</label>
+        <input type="text" name="workplace" required><br><br>
+        
+        <label for="password">Password:</label>
+        <input type="password" name="password" required><br><br>
+        
+        <input type="submit" value="Add Doctor">
+    </form>
+</body>
+</html>

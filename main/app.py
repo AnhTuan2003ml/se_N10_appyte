@@ -23,6 +23,7 @@ class User(db.Model):
     is_admin = db.Column(db.Boolean, nullable=False, default=False)
     def __str__(self):
         return self.email
+    
 class  Diseases(db.Model):
     __tablename__ = 'disease'
     id = db.Column(db.Integer, unique=True, primary_key=True)
@@ -30,7 +31,39 @@ class  Diseases(db.Model):
     diseases_symptom = db.Column(db.Text, nullable=True)
     def __str__(self):
         return self.diseases_symptom
-    
+
+
+class Doctor(db.Model):
+    __tablename__ = 'doctors'
+    id = db.Column(db.Integer, primary_key=True, autoincrement=True)
+    email = db.Column(db.String(255), nullable=False)
+    name = db.Column(db.String(255), nullable=False)
+    experience = db.Column(db.Integer, nullable=False)
+    age = db.Column(db.Integer, nullable=False)
+    specialization = db.Column(db.String(255), nullable=False)
+    workplace = db.Column(db.String(255), nullable=False)
+    password = db.Column(db.String(255), nullable=False)
+
+    def __init__(self, email, name, experience, age, specialization, workplace, password):
+        self.email = email
+        self.name = name
+        self.experience = experience
+        self.age = age
+        self.specialization = specialization
+        self.workplace = workplace
+        self.password = password
+
+def get_doctor_count():
+    with app.app_context():
+        return Doctor.query.count()
+
+def get_user_count():
+    with app.app_context():
+        return User.query.count()
+
+
+userscount = get_user_count()
+doctorscount =  get_doctor_count()
 @app.route('/')
 def index():
     return render_template('index.html')
@@ -84,10 +117,8 @@ def register():
 def profile():
     if 'user' in session:
         user = User.query.filter_by(email=session['user']).first()
-        if user.diseases_past is None and user.diseases_present is None:
-            return render_template('profile.html', user=user)
-        else:
-            return render_template('newprofile.html', user=user)
+        return render_template('profile.html', user=user)
+        
     else:
         return redirect(url_for('login'))
 
@@ -115,24 +146,22 @@ def update_diseases():
             user.diseases_past = request.form['diseases_past']
             user.diseases_present = request.form['diseases_present']
             db.session.commit()
-            return render_template('newprofile.html', user=user)
+            return render_template('profile.html', user=user)
         return render_template('update_diseases.html', user=user)
     else:
         return redirect(url_for('login'))
-
 @app.route('/admin')
 def admin():
     if 'user' in session:
         user = User.query.filter_by(email=session['user']).first()
         if user.is_admin:
             users = User.query.all()
-            return render_template('users.html', users=users)
+            return render_template('users.html', users=users, user=user, users_count= userscount,doctors_count=doctorscount)  # Thêm biến user vào hàm render_template
         else:
-            # Người dùng không phải admin, chuyển hướng về trang profile
-            return  render_template('home.html')
+            return render_template('home.html', user=user)  # Thêm biến user vào hàm render_template
     else:
-        # Người dùng chưa đăng nhập, chuyển hướng về trang đăng nhập
         return redirect(url_for('login'))
+
     
 @app.route('/admin/delete-user/<int:user_id>', methods=['POST'])
 def delete_user(user_id):
@@ -153,6 +182,62 @@ def search():
     symptom = request.form['text']
     diseases = Diseases.query.filter_by( diseases_symptom=symptom).first()
     return render_template('diseases.html', diseases=diseases)
+
+@app.route('/doctor')
+def doctor():
+    doctors= Doctor.query.all()
+    if 'user' in session:
+        user = User.query.filter_by(email=session['user']).first()
+        if user.is_admin:
+            return render_template('doctors.html', doctors=doctors, user=user,users_count= userscount,doctors_count=doctorscount)  # Thêm biến user vào hàm render_template
+        else:
+            return render_template('doctor.html', doctors=doctors)  # Thêm biến user vào hàm render_template
+    else:
+        return redirect(url_for('login'))
+...
+
+@app.route('/add_doctor', methods=['GET', 'POST'])
+def add_doctor():
+    if 'user' in session:
+        user = User.query.filter_by(email=session['user']).first()
+        if user.is_admin:
+            if request.method == 'POST':
+                email = request.form['email']
+                name = request.form['name']
+                experience = request.form['experience']
+                age = request.form['age']
+                specialization = request.form['specialization']
+                workplace = request.form['workplace']
+                password = request.form['password']
+                
+                doctor = Doctor(email=email, name=name, experience=experience, age=age, specialization=specialization, workplace=workplace, password=password)
+                db.session.add(doctor)
+                db.session.commit()
+                
+                return redirect(url_for('doctor'))
+                
+            return render_template('add_doctor.html', user=user)
+        else:
+            return redirect(url_for('home'))
+    else:
+        return redirect(url_for('login'))
+
+
+
+@app.route('/delete-doctor/<int:doctor_id>', methods=['POST'])
+def delete_doctor(doctor_id):
+    if 'user' in session:
+        user = User.query.filter_by(email=session['user']).first()
+        if user.is_admin:
+            doctor = Doctor.query.get(doctor_id)
+            if doctor:
+                db.session.delete(doctor)
+                db.session.commit()
+            
+    return redirect(url_for('doctor'))
+
+
+
 
 if __name__ == '__main__':
     app.run(debug=True)
